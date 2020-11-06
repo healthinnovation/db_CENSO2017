@@ -2,12 +2,12 @@
 INEI_processing <- function(folder) {
   
   x <- c("RegionLima.xlsX","ProvinciaLima.xlsX")
-  list <- list.files(paste0("./RAW_DATA/Censo 2017/",folder))
+  list <- list.files(paste0("./RAW_DATA/",folder))
   list <- list[!list %in% x]
   
   for(i in 1:length(list)) {
     
-    temp.df <- read_excel(paste0("./RAW_DATA/Censo 2017/",folder,"/",list[i]),
+    temp.df <- read_excel(paste0("./RAW_DATA/",folder,"/",list[i]),
                           col_names = FALSE)%>%
       replace(.=="De 0  a 4 años","00-04")%>%replace(.=="De 5  a 9 años","05-09")%>%
       replace(.=="De 10 a 14 años","10-14")%>%replace(.=="De 15 a 19 años","15-19")%>%
@@ -89,7 +89,7 @@ INEI_processing <- function(folder) {
       )
     
     
-    if(i==1) {final.df <- temp.df} else {final.df <- bind_rows(final.df,temp.df)}
+    if(i==1) {final.df <- temp.df} else {final.df <- bind_rows(final.df,temp.df)%>%replace(is.na(.), as.character(0))}
     
   }
   

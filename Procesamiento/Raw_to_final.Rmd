@@ -1,0 +1,190 @@
+---
+title: "Raw_to_final"
+output: html_document
+---
+
+```{r}
+source('./_scripts/Libraries.R', echo = TRUE, encoding="UTF-8")
+
+rename_col_exists <- function(df,var) {
+  {if(var %in% names(df)) sym(var) else NULL}
+}
+```
+
+
+### Censo 2017 
+
+Las multiples tablas dentro de la hoja de Excel que entrega la plataforma del INEI (REDATAM) son transformadas en una base de datos funcional.
+
+Con la función INEI_processing se extraen los datos para cada variable del censo.
+
+```{r}
+llave <- c("dep","prov","distr","cat_edad")
+
+source('./_scripts/func_INEI_processing.R', echo = TRUE, encoding="UTF-8")
+```
+
+
+```{r}
+#source('./_scripts/INEI_Censo_Extraction.R', echo = TRUE, encoding="UTF-8")
+
+#write.csv(INEI_final,"./FINAL_DATA/INEI_censo2017_final.csv")
+```
+
+## Extracción por variable
+
+### Sexo
+
+```{r}
+source('./_scripts/func_INEI_sexo.R', echo = TRUE, encoding="UTF-8")
+
+#INEI_Autoidentificacion
+```
+
+### Total
+
+
+```{r}
+INEI_total <- INEI_Sexo %>% group_by(dep,prov,distr,ubigeo) %>%
+  dplyr::mutate(INEI_total = as.integer(INEI_Sexo_Mas_2017) + as.integer(INEI_Sexo_Fem_2017)) %>% 
+  dplyr::summarise(INEI_total = sum(INEI_total))
+```
+
+
+
+
+## Aseguramiento
+
+```{r}
+source('./_scripts/func_INEI_aseguramiento.R', echo = TRUE, encoding="UTF-8")
+
+llave.inei <- c(llave,"ubigeo")
+INEI_Aseg<- data.frame(dep = as.character(),
+                        prov =as.character(),
+                        distr =as.character(),
+                        cat_edad=as.character(),
+                        ubigeo=as.character())
+
+INEI_Aseg <- INEI_Aseg %>% 
+  merge(INEI_AflSeg,
+        by=llave.inei,all=T)%>% 
+  merge(INEI_AflEsSalud,
+        by=llave.inei,all=T)%>% 
+  merge(INEI_AflFFAA,
+        by=llave.inei,all=T)%>% 
+  merge(INEI_AflNoSeg,
+        by=llave.inei,all=T)%>% 
+  merge(INEI_AflPrivSeg,
+        by=llave.inei,all=T)%>% 
+  merge(INEI_AflSIS,
+        by=llave.inei,all=T)
+
+
+INEI_Aseg_prop <- INEI_Aseg  %>%
+  dplyr::group_by(dep,prov,distr,ubigeo) %>% 
+  dplyr::summarise(INEI_NoAfl_SiSeg_2017 = sum(as.integer(INEI_NoAfl_SiSeg_2017)),
+                   INEI_NoAfl_Total_2017 = sum(as.integer(INEI_NoAfl_Total_2017))) %>%
+  ungroup() %>%
+  dplyr::mutate(INEI_aseg_prop = INEI_NoAfl_SiSeg_2017/INEI_NoAfl_Total_2017)
+```
+
+
+## Autoidentificacion
+
+```{r}
+source('./_scripts/func_INEI_autoidentificacion.R', echo = TRUE, encoding="UTF-8")
+
+#INEI_Autoidentificacion
+
+
+INEI_Autoident_valid_Total <- INEI_Autoidentificacion %>%
+  dplyr::group_by(dep,prov,distr,ubigeo) %>% 
+  dplyr::summarise(INEI_autoident_TotalValid_2017 = sum(as.integer(INEI_autoident_Total_2017))) 
+
+
+INEI_Autoident_Mst_prop <- INEI_Autoidentificacion  %>%
+  dplyr::group_by(dep,prov,distr,ubigeo) %>%
+  dplyr::summarise(INEI_Autoident_Mst = sum(as.integer(INEI_autoident_Mst_2017))) %>%
+  inner_join(INEI_Autoident_valid_Total, by=c("dep","prov","distr","ubigeo")) %>%
+  dplyr::mutate(
+    INEI_prop_Autoident_NoMst = (INEI_autoident_TotalValid_2017-INEI_Autoident_Mst)/INEI_autoident_TotalValid_2017) %>%
+  dplyr::select(dep,prov,distr,INEI_prop_Autoident_NoMst)
+
+rm(INEI_Autoident_valid_Total)
+```
+
+
+## Estudios
+
+```{r}
+source('./_scripts/func_INEI_estudios.R', echo = TRUE, encoding="UTF-8")
+
+#INEI_NiveldeEstudio
+
+INEI_sec_inf_total <- INEI_NiveldeEstudio %>% 
+  dplyr::filter(cat_edad!="20-24"&cat_edad!="15-19"&
+                  cat_edad!="10-14"&cat_edad!="05-09"&
+                  cat_edad!="00-04"&cat_edad!="Total")  %>%
+  dplyr::group_by(dep,prov,distr,ubigeo) %>% 
+  dplyr::summarise(INEI_niv.ins_25yrs_Total_2017 = sum(as.integer(INEI_niv.ins_Total_2017)))
+
+INEI_sec_inf_prop <- INEI_NiveldeEstudio %>% 
+  dplyr::filter(cat_edad!="20-24"&cat_edad!="15-19"&
+                  cat_edad!="10-14"&cat_edad!="05-09"&
+                  cat_edad!="00-04"&cat_edad!="Total")  %>%
+  dplyr::group_by(dep,prov,distr,ubigeo) %>% 
+  dplyr::mutate(INEI_niv.ins_secysup_2017 = 
+                  as.integer(INEI_niv.ins_Scn_2017)+as.integer(INEI_niv.ins_SprUnvInc_2017)+
+                  as.integer(INEI_niv.ins_SprUnvComp_2017)+
+                  as.integer(INEI_niv.ins_SprNUnInc_2017)+
+                  as.integer(INEI_niv.ins_SprNUnCmp_2017)+
+                  as.integer(INEI_niv.ins_MasDoc_2017)) %>%
+  dplyr::summarise(INEI_niv.ins_secysup_2017 = sum(as.integer(INEI_niv.ins_secysup_2017))) %>%
+  inner_join(INEI_sec_inf_total, by=c("dep","prov","distr","ubigeo")) %>%
+  dplyr::mutate(
+    INEI_prop_niv.insInf_25yrs = (INEI_niv.ins_25yrs_Total_2017-INEI_niv.ins_secysup_2017)/INEI_niv.ins_25yrs_Total_2017) %>%
+  dplyr::select(dep,prov,distr,INEI_prop_niv.insInf_25yrs)
+
+
+rm(INEI_sec_inf_total)
+```
+
+
+
+## Mayor de 65 años 
+
+```{r}
+INEI_65annus <- INEI_Sexo %>% 
+  dplyr::filter(cat_edad=="65-69"|cat_edad=="70-74"|
+                  cat_edad=="75-79"|cat_edad=="80-84"|
+                  cat_edad=="85-89"|cat_edad=="90-94"|cat_edad=="95-+")  %>%
+  dplyr::group_by(dep,prov,distr,ubigeo) %>%
+  mutate(INEI_Total_pop_2017 = as.integer(INEI_Sexo_Mas_2017)+as.integer(INEI_Sexo_Fem_2017)) %>% 
+  dplyr::summarise(INEI_65annus_2017 = sum(INEI_Total_pop_2017)) %>%
+  ungroup() %>%
+  inner_join(INEI_total,by=c("dep","prov","distr","ubigeo")) %>%
+  dplyr::mutate(INEI_prop_65annus_2017 = INEI_65annus_2017/INEI_total)
+```
+
+
+
+## Abastecimiento de agua
+
+```{r}
+source('./_scripts/func_INEI_AbsAgu.R', echo = TRUE, encoding="UTF-8")
+
+#INEI_AbsAgu
+```
+
+## Total de personas por hogar
+
+```{r}
+source('./_scripts/func_INEI_totalhogar.R', echo = TRUE, encoding="UTF-8")
+
+# INEI_TotalPerHogar
+```
+
+
+
+
+
