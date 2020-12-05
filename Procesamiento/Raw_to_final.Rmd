@@ -43,14 +43,15 @@ source('./_scripts/func_INEI_sexo.R', echo = TRUE, encoding="UTF-8")
 
 ### Total
 
-
 ```{r}
-INEI_total <- INEI_Sexo %>% group_by(dep,prov,distr,ubigeo) %>%
+INEI_total <- INEI_Sexo %>% group_by(dep,prov,distr,ubigeo)%>% 
+  dplyr::filter(cat_edad=="Total") %>%
   dplyr::mutate(INEI_total = as.integer(INEI_Sexo_Mas_2017) + as.integer(INEI_Sexo_Fem_2017)) %>% 
-  dplyr::summarise(INEI_total = sum(INEI_total))
+  dplyr::summarise(INEI_total_2017 = sum(INEI_total),
+                   INEI_Sexo_Mas_2017 = sum(as.integer(INEI_Sexo_Mas_2017)),
+                    INEI_Sexo_Fem_2017 = sum(as.integer(INEI_Sexo_Fem_2017))
+                   )
 ```
-
-
 
 
 ## Aseguramiento
@@ -59,6 +60,7 @@ INEI_total <- INEI_Sexo %>% group_by(dep,prov,distr,ubigeo) %>%
 source('./_scripts/func_INEI_aseguramiento.R', echo = TRUE, encoding="UTF-8")
 
 llave.inei <- c(llave,"ubigeo")
+
 INEI_Aseg<- data.frame(dep = as.character(),
                         prov =as.character(),
                         distr =as.character(),
@@ -80,16 +82,23 @@ INEI_Aseg <- INEI_Aseg %>%
         by=llave.inei,all=T)
 
 
-INEI_Aseg_prop <- INEI_Aseg  %>%
+INEI_Aseg_prop <- INEI_Aseg %>% 
+  dplyr::filter(cat_edad=="Total")  %>%
   dplyr::group_by(dep,prov,distr,ubigeo) %>% 
   dplyr::summarise(INEI_NoAfl_SiSeg_2017 = sum(as.integer(INEI_NoAfl_SiSeg_2017)),
                    INEI_NoAfl_Total_2017 = sum(as.integer(INEI_NoAfl_Total_2017))) %>%
   ungroup() %>%
-  dplyr::mutate(INEI_aseg_prop = INEI_NoAfl_SiSeg_2017/INEI_NoAfl_Total_2017)
+  dplyr::mutate(INEI_prop_aseg_2017 = INEI_NoAfl_SiSeg_2017/INEI_NoAfl_Total_2017)%>%
+  dplyr::select(dep,prov,distr,
+                INEI_NoAfl_SiSeg_2017,
+                INEI_NoAfl_Total_2017,
+                INEI_prop_aseg_2017)
 ```
 
 
 ## Autoidentificacion
+
+Las  personas que respondieron esta pregunta es a partir de los 14 años, y el "total" incluye aquellos que "no saben o no respondieron". Excluye a los menores de 14 años (NA) y no son contabilizados al total.
 
 ```{r}
 source('./_scripts/func_INEI_autoidentificacion.R', echo = TRUE, encoding="UTF-8")
@@ -97,18 +106,23 @@ source('./_scripts/func_INEI_autoidentificacion.R', echo = TRUE, encoding="UTF-8
 #INEI_Autoidentificacion
 
 
-INEI_Autoident_valid_Total <- INEI_Autoidentificacion %>%
+INEI_Autoident_valid_Total <- INEI_Autoidentificacion%>% 
+  dplyr::filter(cat_edad=="Total")  %>%
   dplyr::group_by(dep,prov,distr,ubigeo) %>% 
   dplyr::summarise(INEI_autoident_TotalValid_2017 = sum(as.integer(INEI_autoident_Total_2017))) 
 
 
-INEI_Autoident_Mst_prop <- INEI_Autoidentificacion  %>%
+INEI_Autoident_Mst_prop <- INEI_Autoidentificacion%>% 
+  dplyr::filter(cat_edad=="Total")   %>%
   dplyr::group_by(dep,prov,distr,ubigeo) %>%
   dplyr::summarise(INEI_Autoident_Mst = sum(as.integer(INEI_autoident_Mst_2017))) %>%
   inner_join(INEI_Autoident_valid_Total, by=c("dep","prov","distr","ubigeo")) %>%
-  dplyr::mutate(
-    INEI_prop_Autoident_NoMst = (INEI_autoident_TotalValid_2017-INEI_Autoident_Mst)/INEI_autoident_TotalValid_2017) %>%
-  dplyr::select(dep,prov,distr,INEI_prop_Autoident_NoMst)
+  dplyr::mutate(INEI_Autoident_NoMst_2017 = INEI_autoident_TotalValid_2017-INEI_Autoident_Mst,
+    INEI_prop_Autoident_NoMst_2017 = INEI_Autoident_NoMst/INEI_autoident_TotalValid_2017) %>%
+  dplyr::select(dep,prov,distr,
+                INEI_Autoident_NoMst_2017,
+                INEI_autoident_TotalValid_2017,
+                INEI_prop_Autoident_NoMst_2017)
 
 rm(INEI_Autoident_valid_Total)
 ```
@@ -141,14 +155,16 @@ INEI_sec_inf_prop <- INEI_NiveldeEstudio %>%
                   as.integer(INEI_niv.ins_MasDoc_2017)) %>%
   dplyr::summarise(INEI_niv.ins_secysup_2017 = sum(as.integer(INEI_niv.ins_secysup_2017))) %>%
   inner_join(INEI_sec_inf_total, by=c("dep","prov","distr","ubigeo")) %>%
-  dplyr::mutate(
-    INEI_prop_niv.insInf_25yrs = (INEI_niv.ins_25yrs_Total_2017-INEI_niv.ins_secysup_2017)/INEI_niv.ins_25yrs_Total_2017) %>%
-  dplyr::select(dep,prov,distr,INEI_prop_niv.insInf_25yrs)
+  dplyr::mutate(INEI_niv.insInf_25yrs_2017 = INEI_niv.ins_25yrs_Total_2017-INEI_niv.ins_secysup_2017,
+    INEI_prop_niv.insInf_25yrs = INEI_niv.insInf_25yrs_2017/INEI_niv.ins_25yrs_Total_2017) %>%
+  dplyr::select(dep,prov,distr,
+                INEI_niv.insInf_25yrs_2017,
+                INEI_niv.ins_25yrs_Total_2017,
+                INEI_prop_niv.insInf_25yrs)
 
 
 rm(INEI_sec_inf_total)
 ```
-
 
 
 ## Mayor de 65 años 
@@ -162,8 +178,12 @@ INEI_65annus <- INEI_Sexo %>%
   mutate(INEI_Total_pop_2017 = as.integer(INEI_Sexo_Mas_2017)+as.integer(INEI_Sexo_Fem_2017)) %>% 
   dplyr::summarise(INEI_65annus_2017 = sum(INEI_Total_pop_2017)) %>%
   ungroup() %>%
-  inner_join(INEI_total,by=c("dep","prov","distr","ubigeo")) %>%
-  dplyr::mutate(INEI_prop_65annus_2017 = INEI_65annus_2017/INEI_total)
+  inner_join(INEI_total%>%select(dep,prov,distr,INEI_total_2017),by=c("dep","prov","distr")) %>%
+  dplyr::mutate(INEI_prop_65annus_2017 = INEI_65annus_2017/INEI_total_2017) %>%
+  dplyr::select(dep,prov,distr,
+                INEI_65annus_2017,
+                INEI_total_2017,
+                INEI_prop_65annus_2017)
 ```
 
 
@@ -174,6 +194,22 @@ INEI_65annus <- INEI_Sexo %>%
 source('./_scripts/func_INEI_AbsAgu.R', echo = TRUE, encoding="UTF-8")
 
 #INEI_AbsAgu
+
+INEI_AbsAgu_prop <- INEI_AbsAgu %>% 
+  #dplyr::filter(cat_edad=="Total")  %>%
+  dplyr::group_by(dep,prov,distr,ubigeo) %>% 
+  dplyr::summarise(INEI_AbsAguVvn_RdPVvn_2017 = sum(as.integer(INEI_AbsAguVvn_RdPVvn_2017)),
+                   INEI_AbsAguVvn_RdPEdf_2017 = sum(as.integer(INEI_AbsAguVvn_RdPEdf_2017)),
+                   INEI_AbsAguVvn_Total_2017 = sum(as.integer(INEI_AbsAguVvn_Total_2017))
+                   ) %>%
+  ungroup() %>%
+  dplyr::mutate(INEI_AbsAguVvn_RdP_2017 = INEI_AbsAguVvn_RdPVvn_2017+ INEI_AbsAguVvn_RdPEdf_2017,
+                INEI_prop_AbsAguVvn_RdPVvn_2017= INEI_AbsAguVvn_RdPVvn_2017/INEI_AbsAguVvn_Total_2017,
+                INEI_prop_AbsAguVvn_int_2017 = INEI_AbsAguVvn_RdP_2017/INEI_AbsAguVvn_Total_2017)%>%
+  dplyr::select(dep,prov,distr,  
+                INEI_AbsAguVvn_RdP_2017,
+                INEI_AbsAguVvn_Total_2017,
+                INEI_prop_AbsAguVvn_int_2017)
 ```
 
 ## Total de personas por hogar
@@ -187,4 +223,15 @@ source('./_scripts/func_INEI_totalhogar.R', echo = TRUE, encoding="UTF-8")
 
 
 
+```{r}
+INEI_total 
+INEI_Aseg_prop
+INEI_Autoident_Mst_prop
+INEI_sec_inf_prop
+INEI_65annus
+INEI_AbsAgu_prop
+
+
+
+```
 
