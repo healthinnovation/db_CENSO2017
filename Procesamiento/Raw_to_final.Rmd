@@ -3,6 +3,15 @@ title: "Raw_to_final"
 output: html_document
 ---
 
+Configuración de output (exportación de la base)
+
+```{r}
+output.csv = FALSE
+```
+
+
+
+
 ```{r}
 source('./_scripts/Libraries.R', echo = TRUE, encoding="UTF-8")
 
@@ -118,7 +127,7 @@ INEI_Autoident_Mst_prop <- INEI_Autoidentificacion%>%
   dplyr::summarise(INEI_Autoident_Mst = sum(as.integer(INEI_autoident_Mst_2017))) %>%
   inner_join(INEI_Autoident_valid_Total, by=c("dep","prov","distr","ubigeo")) %>%
   dplyr::mutate(INEI_Autoident_NoMst_2017 = INEI_autoident_TotalValid_2017-INEI_Autoident_Mst,
-    INEI_prop_Autoident_NoMst_2017 = INEI_Autoident_NoMst/INEI_autoident_TotalValid_2017) %>%
+                INEI_prop_Autoident_NoMst_2017 = as.integer(INEI_Autoident_NoMst_2017)/as.integer(INEI_autoident_TotalValid_2017)) %>%
   dplyr::select(dep,prov,distr,
                 INEI_Autoident_NoMst_2017,
                 INEI_autoident_TotalValid_2017,
@@ -196,7 +205,7 @@ source('./_scripts/func_INEI_AbsAgu.R', echo = TRUE, encoding="UTF-8")
 #INEI_AbsAgu
 
 INEI_AbsAgu_prop <- INEI_AbsAgu %>% 
-  #dplyr::filter(cat_edad=="Total")  %>%
+  dplyr::filter(cat_edad=="Total")  %>%
   dplyr::group_by(dep,prov,distr,ubigeo) %>% 
   dplyr::summarise(INEI_AbsAguVvn_RdPVvn_2017 = sum(as.integer(INEI_AbsAguVvn_RdPVvn_2017)),
                    INEI_AbsAguVvn_RdPEdf_2017 = sum(as.integer(INEI_AbsAguVvn_RdPEdf_2017)),
@@ -212,10 +221,33 @@ INEI_AbsAgu_prop <- INEI_AbsAgu %>%
                 INEI_prop_AbsAguVvn_int_2017)
 ```
 
+## Area de encuesta
+
+```{r}
+source('./_scripts/func_AreaConceptoEncuesta.R', echo = TRUE, encoding="UTF-8")
+
+INEI_Area_prop <- INEI_Area  %>% 
+  dplyr::filter(cat_edad=="Total")  %>%
+  dplyr::group_by(dep,prov,distr,ubigeo) %>% 
+  dplyr::summarise(INEI_rural_2017 = sum(as.integer(`Rural encuesta`)),
+                   INEI_urbano_2017 = sum(as.integer(`Urbano encuesta`)),
+                   INEI_urbanoyrural_2017 = sum(as.integer(Total))
+                   )%>%
+  ungroup() %>%
+  dplyr::mutate(INEI_prop_urbano_2017 = INEI_urbano_2017/INEI_urbanoyrural_2017)%>%
+  dplyr::select(dep,prov,distr,  
+                INEI_rural_2017,
+                INEI_urbano_2017,
+                INEI_urbanoyrural_2017,
+                INEI_prop_urbano_2017)
+```
+
+
+
 ## Total de personas por hogar
 
 ```{r}
-source('./_scripts/func_INEI_totalhogar.R', echo = TRUE, encoding="UTF-8")
+#source('./_scripts/func_INEI_totalhogar.R', echo = TRUE, encoding="UTF-8")
 
 # INEI_TotalPerHogar
 ```
@@ -224,14 +256,20 @@ source('./_scripts/func_INEI_totalhogar.R', echo = TRUE, encoding="UTF-8")
 
 
 ```{r}
-INEI_total 
-INEI_Aseg_prop
-INEI_Autoident_Mst_prop
-INEI_sec_inf_prop
-INEI_65annus
-INEI_AbsAgu_prop
+INEI_District_Data <- INEI_total %>% 
+  inner_join(INEI_Aseg_prop, by=c("dep","prov","distr")) %>% 
+  inner_join(INEI_Autoident_Mst_prop, by=c("dep","prov","distr")) %>% 
+  inner_join(INEI_sec_inf_prop, by=c("dep","prov","distr")) %>% 
+  inner_join(INEI_65annus, by=c("dep","prov","distr")) %>% 
+  inner_join(INEI_AbsAgu_prop, by=c("dep","prov","distr"))%>% 
+  inner_join(INEI_Area_prop, by=c("dep","prov","distr")) 
+  
 
 
+if (output.csv == T) {
+  write.csv(INEI_District_Data, file.path(paste0("../INEI_District_Data_2017",".csv")),row.names = F)
+}
+saveRDS(INEI_District_Data,file.path(paste0("../INEI_District_Data_2017",".Rdata")))
 
 ```
 
