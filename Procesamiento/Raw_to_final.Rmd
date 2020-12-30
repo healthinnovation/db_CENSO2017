@@ -244,16 +244,222 @@ INEI_Area_prop <- INEI_Area  %>%
 
 
 
-## Total de personas por hogar
+## Tenencia de la vivienda
 
 ```{r}
-#source('./_scripts/func_INEI_totalhogar.R', echo = TRUE, encoding="UTF-8")
+source('./_scripts/func_INEI_TenenciadeVivienda.R', echo = TRUE, encoding="UTF-8")
 
-# INEI_TotalPerHogar
+INEI_Tenencia <- INEI_Tenencia %>% 
+  dplyr::filter(cat_edad=="Total")  %>%
+  dplyr::group_by(dep,prov,distr,ubigeo) %>% 
+  dplyr::summarise(INEI_tenenciaviv_con.titl_2017 = sum(as.integer(INEI_tenenciaviv_con.titl_2017)),
+                   INEI_tenenciaviv_Total_2017 = sum(as.integer(INEI_tenenciaviv_Total_2017))
+                   ) %>%
+  ungroup() %>%
+  dplyr::mutate(INEI_prop_tenenciaviv_2017 = INEI_tenenciaviv_con.titl_2017/INEI_tenenciaviv_Total_2017)%>%
+  dplyr::select(dep,prov,distr,  
+                INEI_tenenciaviv_con.titl_2017,
+                INEI_tenenciaviv_Total_2017,
+                INEI_prop_tenenciaviv_2017)
+
 ```
 
 
+## Vivía en distrito hace 5 años
 
+```{r}
+source('./_scripts/func_INEI_ViviaenDistrito_Hace5annus.R', echo = TRUE, encoding="UTF-8")
+
+
+INEI_ViviaDistrito5anios <- INEI_ViviaDistrito5anios %>% 
+  dplyr::filter(cat_edad=="Total")  %>%
+  dplyr::group_by(dep,prov,distr,ubigeo) %>% 
+  dplyr::summarise(INEI_ViviaDistr5_No_2017 = sum(as.integer(INEI_ViviaDistr5_No_2017)),
+                   INEI_ViviaDistr5_Total_2017 = sum(as.integer(INEI_ViviaDistr5_Total_2017))
+                   ) %>%
+  ungroup() %>%
+  dplyr::mutate(INEI_prop_NoViviaDistr5_2017 = INEI_ViviaDistr5_No_2017/INEI_ViviaDistr5_Total_2017)%>%
+  dplyr::select(dep,prov,distr,  
+                INEI_ViviaDistr5_No_2017,
+                INEI_ViviaDistr5_Total_2017,
+                INEI_prop_NoViviaDistr5_2017)
+```
+
+
+## Total de personas con una computadora en el hogar
+
+```{r}
+source('./_scripts/func_INEI_HogarComputadora.R', echo = TRUE, encoding="UTF-8")
+
+INEI_HogarCompu <- INEI_HogarCompu %>% 
+  dplyr::filter(cat_edad=="Total")  %>%
+  dplyr::group_by(dep,prov,distr,ubigeo) %>% 
+  dplyr::summarise(INEI_ViviaDistr5_No_2017 = sum(as.integer(INEI_ViviaDistr5_No_2017)),
+                   INEI_ViviaDistr5_Total_2017 = sum(as.integer(INEI_ViviaDistr5_Total_2017))
+                   ) %>%
+  ungroup() %>%
+  dplyr::mutate(INEI_prop_NoViviaDistr5_2017 = INEI_ViviaDistr5_No_2017/INEI_ViviaDistr5_Total_2017)%>%
+  dplyr::select(dep,prov,distr,  
+                INEI_ViviaDistr5_No_2017,
+                INEI_ViviaDistr5_Total_2017,
+                INEI_prop_NoViviaDistr5_2017)
+```
+
+
+## Total de personas con un celular en el hogar
+
+```{r}
+source('./_scripts/func_INEI_HogarCelular.R', echo = TRUE, encoding="UTF-8")
+
+INEI_HogarCelular <- INEI_HogarCelular %>% 
+  dplyr::filter(cat_edad=="Total")  %>%
+  dplyr::group_by(dep,prov,distr,ubigeo) %>% 
+  dplyr::summarise(INEI_Celular_Si_2017 = sum(as.integer(INEI_Celular_Si_2017)),
+                   INEI_Celular_Total_2017 = sum(as.integer(INEI_Celular_Total_2017))
+                   ) %>%
+  ungroup() %>%
+  dplyr::mutate(INEI_prop_SiCelular_2017 = INEI_Celular_Si_2017/INEI_Celular_Total_2017)%>%
+  dplyr::select(dep,prov,distr,  
+                INEI_Celular_Si_2017,
+                INEI_Celular_Total_2017,
+                INEI_prop_SiCelular_2017)
+```
+
+
+## Total de personas con alumbrado electrico en su hogar 
+
+```{r}
+source('./_scripts/func_INEI_HogarAlumbradoElectricoRedPublica.R', echo = TRUE, encoding="UTF-8")
+
+INEI_HogarAlumbradoElectricoRedPublica <- INEI_HogarAlumbradoElectricoRedPublica %>% 
+  dplyr::filter(cat_edad=="Total")  %>%
+  dplyr::group_by(dep,prov,distr,ubigeo) %>% 
+  dplyr::summarise(INEI_AlumbradoElectri_Si_2017 = sum(as.integer(INEI_AlumbradoElectri_Si_2017)),
+                   INEI_AlumbradoElectri_Total_2017 = sum(as.integer(INEI_AlumbradoElectri_Total_2017))
+                   ) %>%
+  ungroup() %>%
+  dplyr::mutate(INEI_Prop_AlumbradoElectri_2017 = INEI_AlumbradoElectri_Si_2017/INEI_AlumbradoElectri_Total_2017)%>%
+  dplyr::select(dep,prov,distr,  
+                INEI_AlumbradoElectri_Si_2017,
+                INEI_AlumbradoElectri_Total_2017,
+                INEI_Prop_AlumbradoElectri_2017)
+```
+
+## Total de personas con automovil en su hogar
+
+```{r}
+source('./_scripts/func_INEI_HogarAutomovil.R', echo = TRUE, encoding="UTF-8")
+
+INEI_HogarAutomovil <- INEI_HogarAutomovil%>% 
+  dplyr::filter(cat_edad=="Total")  %>%
+  dplyr::group_by(dep,prov,distr,ubigeo) %>% 
+  dplyr::summarise(INEI_Automovil_Si_2017 = sum(as.integer(INEI_Automovil_Si_2017)),
+                   INEI_Automovil_Total_2017 = sum(as.integer(INEI_Automovil_Total_2017))
+                   ) %>%
+  ungroup() %>%
+  dplyr::mutate(INEI_Prop_SiAutomovil_2017 = INEI_Automovil_Si_2017/INEI_Automovil_Total_2017)%>%
+  dplyr::select(dep,prov,distr,  
+                INEI_Automovil_Si_2017,
+                INEI_Automovil_Total_2017,
+                INEI_Prop_SiAutomovil_2017)
+```
+
+## Total de personas con refrigeradora en su hogar 
+
+```{r}
+source('./_scripts/func_INEI_HogarRefrigerador.R', echo = TRUE, encoding="UTF-8")
+
+INEI_HogarRefrigerador <- INEI_HogarRefrigerador%>% 
+  dplyr::filter(cat_edad=="Total")  %>%
+  dplyr::group_by(dep,prov,distr,ubigeo) %>% 
+  dplyr::summarise(INEI_Refrigerador_Si_2017 = sum(as.integer(INEI_Refrigerador_Si_2017)),
+                   INEI_Refrigerador_Total_2017 = sum(as.integer(INEI_Refrigerador_Total_2017))
+                   ) %>%
+  ungroup() %>%
+  dplyr::mutate(INEI_prop_SiRefrigerador_2017 = INEI_Refrigerador_Si_2017/INEI_Refrigerador_Total_2017)%>%
+  dplyr::select(dep,prov,distr,  
+                INEI_Refrigerador_Si_2017,
+                INEI_Refrigerador_Total_2017,
+                INEI_prop_SiRefrigerador_2017)
+```
+
+## Total de personas con internet en su hogar
+
+```{r}
+source('./_scripts/func_INEI_HogarInternet.R', echo = TRUE, encoding="UTF-8")
+
+INEI_HogarInternet <- INEI_HogarInternet%>% 
+  dplyr::filter(cat_edad=="Total")  %>%
+  dplyr::group_by(dep,prov,distr,ubigeo) %>% 
+  dplyr::summarise(INEI_Internet_Si_2017 = sum(as.integer(INEI_Internet_Si_2017)),
+                   INEI_Internet_Total_2017 = sum(as.integer(INEI_Internet_Total_2017))
+                   ) %>%
+  ungroup() %>%
+  dplyr::mutate(INEI_prop_SiInternet_2017 = INEI_Internet_Si_2017/INEI_Internet_Total_2017)%>%
+  dplyr::select(dep,prov,distr,  
+                INEI_Internet_Si_2017,
+                INEI_Internet_Total_2017,
+                INEI_prop_SiInternet_2017)
+```
+
+## Total de personas con Televisor a Color en su hogar
+
+```{r}
+source('./_scripts/func_INEI_HogarTelevisoraColor.R', echo = TRUE, encoding="UTF-8")
+
+INEI_HogarTelevisoraColor <- INEI_HogarTelevisoraColor%>% 
+  dplyr::filter(cat_edad=="Total")  %>%
+  dplyr::group_by(dep,prov,distr,ubigeo) %>% 
+  dplyr::summarise(INEI_Televisor_Si_2017 = sum(as.integer(INEI_Televisor_Si_2017)),
+                   INEI_Televisor_Total_2017 = sum(as.integer(INEI_Televisor_Total_2017))
+                   ) %>%
+  ungroup() %>%
+  dplyr::mutate(INEI_prop_SiTelevisor_2017 = INEI_Televisor_Si_2017/INEI_Televisor_Total_2017)%>%
+  dplyr::select(dep,prov,distr,  
+                INEI_Televisor_Si_2017,
+                INEI_Televisor_Total_2017,
+                INEI_prop_SiTelevisor_2017)
+```
+
+## Total de personas con Motocicleta en su hogar
+
+```{r}
+source('./_scripts/func_INEI_HogarMotocicleta.R', echo = TRUE, encoding="UTF-8")
+
+INEI_HogarMotocicleta <- INEI_HogarMotocicleta %>% 
+  dplyr::filter(cat_edad=="Total")  %>%
+  dplyr::group_by(dep,prov,distr,ubigeo) %>% 
+  dplyr::summarise(INEI_Motocicleta_Si_2017 = sum(as.integer(INEI_Motocicleta_Si_2017)),
+                   INEI_Motocicleta_Total_2017 = sum(as.integer(INEI_Motocicleta_Total_2017))
+                   ) %>%
+  ungroup() %>%
+  dplyr::mutate(INEI_prop_SiMotocicleta_2017 = INEI_Motocicleta_Si_2017/INEI_Motocicleta_Total_2017)%>%
+  dplyr::select(dep,prov,distr,  
+                INEI_Motocicleta_Si_2017,
+                INEI_Motocicleta_Total_2017,
+                INEI_prop_SiMotocicleta_2017)
+```
+
+## Total de personas con Lancha, Botes, Canoas, Peque peques, u otros en su hogar
+
+```{r}
+source('./_scripts/func_INEI_HogarBoteLanchaCanoa.R', echo = TRUE, encoding="UTF-8")
+
+INEI_HogarBoteLanchaCanoa <- INEI_HogarBoteLanchaCanoa %>% 
+  dplyr::filter(cat_edad=="Total")  %>%
+  dplyr::group_by(dep,prov,distr,ubigeo) %>% 
+  dplyr::summarise(INEI_BoteLancha_Si_2017 = sum(as.integer(INEI_BoteLancha_Si_2017)),
+                   INEI_BoteLancha_Total_2017 = sum(as.integer(INEI_BoteLancha_Total_2017))
+                   ) %>%
+  ungroup() %>%
+  dplyr::mutate(INEI_prop_SiBoteLancha_2017 = INEI_BoteLancha_Si_2017/INEI_BoteLancha_Total_2017)%>%
+  dplyr::select(dep,prov,distr,  
+                INEI_BoteLancha_Si_2017,
+                INEI_BoteLancha_Total_2017,
+                INEI_prop_SiBoteLancha_2017)
+```
+
+# Arreglo final
 
 ```{r}
 INEI_District_Data <- INEI_total %>% 
@@ -262,7 +468,21 @@ INEI_District_Data <- INEI_total %>%
   inner_join(INEI_sec_inf_prop, by=c("dep","prov","distr")) %>% 
   inner_join(INEI_65annus, by=c("dep","prov","distr")) %>% 
   inner_join(INEI_AbsAgu_prop, by=c("dep","prov","distr"))%>% 
-  inner_join(INEI_Area_prop, by=c("dep","prov","distr")) 
+  inner_join(INEI_Area_prop, by=c("dep","prov","distr"))%>% 
+  inner_join(INEI_HogarBoteLanchaCanoa, by=c("dep","prov","distr")) %>% 
+  inner_join(INEI_HogarMotocicleta, by=c("dep","prov","distr")) %>% 
+  inner_join(INEI_HogarTelevisoraColor, by=c("dep","prov","distr")) %>% 
+  inner_join(INEI_HogarInternet, by=c("dep","prov","distr")) %>% 
+  inner_join(INEI_HogarRefrigerador, by=c("dep","prov","distr")) %>% 
+  inner_join(INEI_HogarAutomovil, by=c("dep","prov","distr")) %>% 
+  inner_join(INEI_HogarAlumbradoElectricoRedPublica, by=c("dep","prov","distr")) %>% 
+  inner_join(INEI_HogarCelular, by=c("dep","prov","distr")) %>% 
+  inner_join(INEI_HogarCompu, by=c("dep","prov","distr")) %>% 
+  inner_join(INEI_ViviaDistrito5anios, by=c("dep","prov","distr")) %>% 
+  inner_join(INEI_Tenencia, by=c("dep","prov","distr")) 
+  
+  
+  
   
 
 
