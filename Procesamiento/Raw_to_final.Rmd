@@ -62,6 +62,16 @@ INEI_total <- INEI_Sexo %>% group_by(dep,prov,distr,ubigeo)%>%
                    )
 ```
 
+### Edades
+
+```{r}
+INEI_Edad <- INEI_Sexo%>% 
+  dplyr::filter(cat_edad!="Total") %>%
+  dplyr::mutate(INEI_total = as.integer(INEI_Sexo_Mas_2017) + as.integer(INEI_Sexo_Fem_2017)) %>%
+  dplyr::select(dep,prov,distr,cat_edad,INEI_total) %>%
+  spread(cat_edad, INEI_total)
+```
+
 
 ## Aseguramiento
 
@@ -294,15 +304,15 @@ source('./_scripts/func_INEI_HogarComputadora.R', echo = TRUE, encoding="UTF-8")
 INEI_HogarCompu <- INEI_HogarCompu %>% 
   dplyr::filter(cat_edad=="Total")  %>%
   dplyr::group_by(dep,prov,distr,ubigeo) %>% 
-  dplyr::summarise(INEI_ViviaDistr5_No_2017 = sum(as.integer(INEI_ViviaDistr5_No_2017)),
-                   INEI_ViviaDistr5_Total_2017 = sum(as.integer(INEI_ViviaDistr5_Total_2017))
+  dplyr::summarise(INEI_CmpuLaptTab_Si_2017 = sum(as.integer(INEI_CmpuLaptTab_Si_2017)),
+                   INEI_CmpuLaptTab_Total_2017 = sum(as.integer(INEI_CmpuLaptTab_Total_2017))
                    ) %>%
   ungroup() %>%
-  dplyr::mutate(INEI_prop_NoViviaDistr5_2017 = INEI_ViviaDistr5_No_2017/INEI_ViviaDistr5_Total_2017)%>%
+  dplyr::mutate(INEI_prop_CmpuLaptTab_2017 = INEI_CmpuLaptTab_Si_2017/INEI_CmpuLaptTab_Total_2017)%>%
   dplyr::select(dep,prov,distr,  
-                INEI_ViviaDistr5_No_2017,
-                INEI_ViviaDistr5_Total_2017,
-                INEI_prop_NoViviaDistr5_2017)
+                INEI_CmpuLaptTab_Si_2017,
+                INEI_CmpuLaptTab_Total_2017,
+                INEI_prop_CmpuLaptTab_2017)
 ```
 
 
@@ -479,11 +489,9 @@ INEI_District_Data <- INEI_total %>%
   inner_join(INEI_HogarCelular, by=c("dep","prov","distr")) %>% 
   inner_join(INEI_HogarCompu, by=c("dep","prov","distr")) %>% 
   inner_join(INEI_ViviaDistrito5anios, by=c("dep","prov","distr")) %>% 
-  inner_join(INEI_Tenencia, by=c("dep","prov","distr")) 
-  
-  
-  
-  
+  inner_join(INEI_Tenencia, by=c("dep","prov","distr"))  %>% 
+  inner_join(INEI_Edad, by=c("dep","prov","distr")) 
+
 
 
 if (output.csv == T) {
