@@ -1,11 +1,11 @@
 # Libraries
 
 #remotes::install_github("giocomai/ganttrify")
-library(ganttrify)
+#library(ganttrify)
 
 #devtools::install_github("hrbrmstr/streamgraph")
 #install.packages("ellipsis")
-library(streamgraph)
+#library(streamgraph)
 
 #devtools::install_github('Ather-Energy/ggTimeSeries')
 library(ggTimeSeries)
