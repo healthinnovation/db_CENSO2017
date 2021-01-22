@@ -1,7 +1,7 @@
 #Ignorando el archuvo individual de "RegionLima" y "ProvinciaLima", todo est aincluido en "LIMA"
 INEI_processing <- function(folder) {
   
-  x <- c("RegionLima.xlsX","ProvinciaLima.xlsX")
+  x <- c("RegionLima.xlsX","ProvinciaLima.xlsX","lima_region.xlsx","lima_provincia.xlsx")
   list <- list.files(paste0("./RAW_DATA/",folder))
   list <- list[!list %in% x]
   
@@ -31,7 +31,11 @@ INEI_processing <- function(folder) {
     
     if (folder == "Autoidentificacion") {
       initial_agecat <- sym("10-14")
-    } else {initial_agecat <- sym("00-04")}
+    }  else if (folder == "ubicacion_centro_trabajo"){
+      
+      initial_agecat <- sym("05-09")  
+      
+      }else {initial_agecat <- sym("00-04")}
     
     temp.df <- temp.df %>% mutate(dep = ifelse(temp.df[[2]] != "P: Edad en grupos quinquenales" & 
                                                  temp.df[[2]] != as.character(initial_agecat) & 
@@ -60,14 +64,19 @@ INEI_processing <- function(folder) {
       replace(. == "-", as.character(0))
     
     # INEI shenanigans
+    
+    # Elimina todas las filas con 0 en toda la fila (rezago de la limpeza de datos anterior)
+    # Esta función es super sensible a "initial_agecat <- sym("10-14") "y no tengo idea por qué 
+
+    
     #Resumen <- temp.df[which(temp.df[1] == "0"):nrow(temp.df),1:ncol(temp.df)]
     temp.df <-temp.df[1:(which(temp.df[1] == "0" & temp.df[ncol(temp.df)] == "0"))-1,1:ncol(temp.df)]
     
     #Variables disponibles unique(temp.df[1])
     
     temp.df <- temp.df %>% 
-      gather(cat_edad,n,initial_agecat:`Total`)%>% 
-      mutate(!!var := as.factor(!!sym(var))) %>%
+      gather(cat_edad,n,initial_agecat:`Total`) %>% 
+      mutate(!!var := as.factor(!!sym(var))) %>% dplyr::filter(dep!="0") %>%
       spread(sym(var) ,n)%>% 
       replace(is.na(.), as.character(0))%>%
       separate(dep,
