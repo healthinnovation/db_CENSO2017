@@ -7,9 +7,15 @@ Configuración de output (exportación de la base)
 
 ```{r}
 output.csv = FALSE
-```
 
-```{r}
+knitr::opts_chunk$set(echo = T,
+  message = F,
+  warning = F,
+  error= F,
+  fig.width = 8,
+  fig.height = 5
+  )
+
 source('./_scripts/Libraries.R', echo = TRUE, encoding="UTF-8")
 
 rename_col_exists <- function(df,var) {
@@ -42,7 +48,9 @@ source('./_scripts/func_INEI_processing.R', echo = TRUE, encoding="UTF-8")
 ### Sexo
 
 ```{r}
+suppressMessages(
 source('./_scripts/func_INEI_sexo.R', echo = TRUE, encoding="UTF-8")
+)
 
 #INEI_Autoidentificacion
 ```
@@ -73,7 +81,10 @@ INEI_Edad <- INEI_Sexo%>%
 ## Aseguramiento
 
 ```{r}
+suppressMessages(
+
 source('./_scripts/func_INEI_aseguramiento.R', echo = TRUE, encoding="UTF-8")
+)
 
 llave.inei <- c(llave,"ubigeo")
 
@@ -117,8 +128,10 @@ INEI_Aseg_prop <- INEI_Aseg %>%
 Las  personas que respondieron esta pregunta es a partir de los 14 años, y el "total" incluye aquellos que "no saben o no respondieron". Excluye a los menores de 14 años (NA) y no son contabilizados al total.
 
 ```{r}
-source('./_scripts/func_INEI_autoidentificacion.R', echo = TRUE, encoding="UTF-8")
+suppressMessages(
 
+source('./_scripts/func_INEI_autoidentificacion.R', echo = TRUE, encoding="UTF-8")
+)
 #INEI_Autoidentificacion
 
 
@@ -147,8 +160,10 @@ rm(INEI_Autoident_valid_Total)
 ## Estudios
 
 ```{r}
-source('./_scripts/func_INEI_estudios.R', echo = TRUE, encoding="UTF-8")
+suppressMessages(
 
+source('./_scripts/func_INEI_estudios.R', echo = TRUE, encoding="UTF-8")
+)
 #INEI_NiveldeEstudio
 
 INEI_sec_inf_total <- INEI_NiveldeEstudio %>% 
@@ -207,7 +222,10 @@ INEI_65annus <- INEI_Sexo %>%
 ## Abastecimiento de agua
 
 ```{r}
+suppressMessages(
+
 source('./_scripts/func_INEI_AbsAgu.R', echo = TRUE, encoding="UTF-8")
+)
 
 #INEI_AbsAgu
 
@@ -231,8 +249,10 @@ INEI_AbsAgu_prop <- INEI_AbsAgu %>%
 ## Area de encuesta
 
 ```{r}
-source('./_scripts/func_AreaConceptoEncuesta.R', echo = TRUE, encoding="UTF-8")
+suppressMessages(
 
+source('./_scripts/func_AreaConceptoEncuesta.R', echo = TRUE, encoding="UTF-8")
+)
 INEI_Area_prop <- INEI_Area  %>% 
   dplyr::filter(cat_edad=="Total")  %>%
   dplyr::group_by(dep,prov,distr,ubigeo) %>% 
@@ -254,8 +274,10 @@ INEI_Area_prop <- INEI_Area  %>%
 ## Tenencia de la vivienda
 
 ```{r}
-source('./_scripts/func_INEI_TenenciadeVivienda.R', echo = TRUE, encoding="UTF-8")
+suppressMessages(
 
+source('./_scripts/func_INEI_TenenciadeVivienda.R', echo = TRUE, encoding="UTF-8")
+)
 INEI_Tenencia <- INEI_Tenencia %>% 
   dplyr::filter(cat_edad=="Total")  %>%
   dplyr::group_by(dep,prov,distr,ubigeo) %>% 
@@ -275,8 +297,10 @@ INEI_Tenencia <- INEI_Tenencia %>%
 ## Vivía en distrito hace 5 años
 
 ```{r}
-source('./_scripts/func_INEI_ViviaenDistrito_Hace5annus.R', echo = TRUE, encoding="UTF-8")
+suppressMessages(
 
+source('./_scripts/func_INEI_ViviaenDistrito_Hace5annus.R', echo = TRUE, encoding="UTF-8")
+)
 
 INEI_ViviaDistrito5anios <- INEI_ViviaDistrito5anios %>% 
   dplyr::filter(cat_edad=="Total")  %>%
@@ -296,8 +320,10 @@ INEI_ViviaDistrito5anios <- INEI_ViviaDistrito5anios %>%
 ## Total de personas con una computadora en el hogar
 
 ```{r}
-source('./_scripts/func_INEI_HogarComputadora.R', echo = TRUE, encoding="UTF-8")
+suppressMessages(
 
+source('./_scripts/func_INEI_HogarComputadora.R', echo = TRUE, encoding="UTF-8")
+)
 INEI_HogarCompu <- INEI_HogarCompu %>% 
   dplyr::filter(cat_edad=="Total")  %>%
   dplyr::group_by(dep,prov,distr,ubigeo) %>% 
@@ -316,7 +342,10 @@ INEI_HogarCompu <- INEI_HogarCompu %>%
 ## Total de personas con un celular en el hogar
 
 ```{r}
+suppressMessages(
+
 source('./_scripts/func_INEI_HogarCelular.R', echo = TRUE, encoding="UTF-8")
+)
 
 INEI_HogarCelular <- INEI_HogarCelular %>% 
   dplyr::filter(cat_edad=="Total")  %>%
@@ -336,7 +365,10 @@ INEI_HogarCelular <- INEI_HogarCelular %>%
 ## Total de personas con alumbrado electrico en su hogar 
 
 ```{r}
+suppressMessages(
+
 source('./_scripts/func_INEI_HogarAlumbradoElectricoRedPublica.R', echo = TRUE, encoding="UTF-8")
+)
 
 INEI_HogarAlumbradoElectricoRedPublica <- INEI_HogarAlumbradoElectricoRedPublica %>% 
   dplyr::filter(cat_edad=="Total")  %>%
@@ -355,7 +387,10 @@ INEI_HogarAlumbradoElectricoRedPublica <- INEI_HogarAlumbradoElectricoRedPublica
 ## Total de personas con automovil en su hogar
 
 ```{r}
+suppressMessages(
+
 source('./_scripts/func_INEI_HogarAutomovil.R', echo = TRUE, encoding="UTF-8")
+)
 
 INEI_HogarAutomovil <- INEI_HogarAutomovil%>% 
   dplyr::filter(cat_edad=="Total")  %>%
@@ -374,8 +409,9 @@ INEI_HogarAutomovil <- INEI_HogarAutomovil%>%
 ## Total de personas con refrigeradora en su hogar 
 
 ```{r}
+suppressMessages(
 source('./_scripts/func_INEI_HogarRefrigerador.R', echo = TRUE, encoding="UTF-8")
-
+)
 INEI_HogarRefrigerador <- INEI_HogarRefrigerador%>% 
   dplyr::filter(cat_edad=="Total")  %>%
   dplyr::group_by(dep,prov,distr,ubigeo) %>% 
@@ -393,7 +429,10 @@ INEI_HogarRefrigerador <- INEI_HogarRefrigerador%>%
 ## Total de personas con internet en su hogar
 
 ```{r}
+suppressMessages(
+
 source('./_scripts/func_INEI_HogarInternet.R', echo = TRUE, encoding="UTF-8")
+)
 
 INEI_HogarInternet <- INEI_HogarInternet%>% 
   dplyr::filter(cat_edad=="Total")  %>%
@@ -411,8 +450,11 @@ INEI_HogarInternet <- INEI_HogarInternet%>%
 
 ## Total de personas con Televisor a Color en su hogar
 
-```{r}
+```{r,message=F}
+suppressMessages(
+
 source('./_scripts/func_INEI_HogarTelevisoraColor.R', echo = TRUE, encoding="UTF-8")
+)
 
 INEI_HogarTelevisoraColor <- INEI_HogarTelevisoraColor%>% 
   dplyr::filter(cat_edad=="Total")  %>%
@@ -431,8 +473,9 @@ INEI_HogarTelevisoraColor <- INEI_HogarTelevisoraColor%>%
 ## Total de personas con Motocicleta en su hogar
 
 ```{r}
+suppressMessages(
 source('./_scripts/func_INEI_HogarMotocicleta.R', echo = TRUE, encoding="UTF-8")
-
+)
 INEI_HogarMotocicleta <- INEI_HogarMotocicleta %>% 
   dplyr::filter(cat_edad=="Total")  %>%
   dplyr::group_by(dep,prov,distr,ubigeo) %>% 
@@ -450,7 +493,10 @@ INEI_HogarMotocicleta <- INEI_HogarMotocicleta %>%
 ## Total de personas con Lancha, Botes, Canoas, Peque peques, u otros en su hogar
 
 ```{r}
+suppressMessages(
+
 source('./_scripts/func_INEI_HogarBoteLanchaCanoa.R', echo = TRUE, encoding="UTF-8")
+)
 
 INEI_HogarBoteLanchaCanoa <- INEI_HogarBoteLanchaCanoa %>% 
   dplyr::filter(cat_edad=="Total")  %>%
@@ -465,6 +511,53 @@ INEI_HogarBoteLanchaCanoa <- INEI_HogarBoteLanchaCanoa %>%
                 INEI_BoteLancha_Total_2017,
                 INEI_prop_SiBoteLancha_2017)
 ```
+
+
+```{r}
+suppressMessages(
+
+source('./_scripts/func_INEI_equipo_sonido.R', echo = TRUE, encoding="UTF-8")
+)
+
+INEI_equipo_sonido <- INEI_equipo_sonido %>% 
+  dplyr::filter(cat_edad=="Total") 
+
+suppressMessages(
+
+source('./_scripts/func_INEI_nro_habitaciones_vivienda.R', echo = TRUE, encoding="UTF-8")
+)
+
+INEI_nro_habitaciones_vivienda <- INEI_nro_habitaciones_vivienda %>% 
+  dplyr::filter(cat_edad=="Total") 
+
+suppressMessages(
+
+source('./_scripts/func_INEI_servicio_higienico.R', echo = TRUE, encoding="UTF-8")
+)
+
+INEI_servicio_higienico <- INEI_servicio_higienico %>% 
+  dplyr::filter(cat_edad=="Total") 
+
+suppressMessages(
+
+source('./_scripts/func_INEI_ubicacion_centro_trabajo.R', echo = TRUE, encoding="UTF-8")
+)
+
+INEI_ubicacion_centro_trabajo <- INEI_ubicacion_centro_trabajo %>% 
+  dplyr::filter(cat_edad=="Total") 
+
+suppressMessages(
+
+source('./_scripts/func_INEI_ubicacion_institucion_educativa.R', echo = TRUE, encoding="UTF-8")
+)
+
+INEI_ubicacion_institucion_educativa <- INEI_ubicacion_institucion_educativa %>% 
+  dplyr::filter(cat_edad=="Total") 
+
+
+```
+
+
 
 # Arreglo final
 
@@ -487,14 +580,18 @@ INEI_District_Data <- INEI_total %>%
   full_join(INEI_HogarCompu, by=c("dep","prov","distr")) %>% 
   full_join(INEI_ViviaDistrito5anios, by=c("dep","prov","distr")) %>% 
   full_join(INEI_Tenencia, by=c("dep","prov","distr"))  %>% 
-  full_join(INEI_Edad, by=c("dep","prov","distr")) 
-
+  full_join(INEI_Edad, by=c("dep","prov","distr"))  %>% 
+  full_join(INEI_ubicacion_centro_trabajo, by=c("dep","prov","distr"))  %>% 
+  full_join(INEI_equipo_sonido, by=c("dep","prov","distr"))  %>% 
+  full_join(INEI_servicio_higienico, by=c("dep","prov","distr"))  %>% 
+  full_join(INEI_ubicacion_institucion_educativa, by=c("dep","prov","distr"))  %>% 
+  full_join(INEI_nro_habitaciones_vivienda, by=c("dep","prov","distr")) 
 
 
 if (output.csv == T) {
-  write.csv(INEI_District_Data, file.path(paste0("../INEI_District_Data_2017",".csv")),row.names = F)
+  write.csv(INEI_District_Data, file.path(paste0("../INEI_District_Data_2017_",Sys.Date(),".csv")),row.names = F)
 }
-saveRDS(INEI_District_Data,file.path(paste0("../INEI_District_Data_2017",".Rdata")))
+saveRDS(INEI_District_Data,file.path(paste0("../INEI_District_Data_2017_",Sys.Date(),".Rdata")))
 
 ```
 
